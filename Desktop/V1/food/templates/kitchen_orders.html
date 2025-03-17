@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %} Kitchen {% endblock %}
+{% block content %}
+<h2>Kitchen Orders</h2>
+{% for order in orders %}
+<div>
+    <h3>Table {{ order.table.table_number }}</h3>
+    <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+    <ul>
+        {% for item in order.items.all %}
+            {% if item.status != 'Finished' and item.status != 'Cancelled' %}
+                <li>
+                    {{ item.dish.name }} - {{ item.quantity }} ({{ item.additional_option }}) - Status: {{ item.status }}
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <label for="new_status_{{ item.id }}">Update Status:</label>
+                        <select name="new_status" id="new_status_{{ item.id }}">
+                            <option value="Cooking" {% if item.status == "Cooking" %}selected{% endif %}>Cooking</option>
+                            <option value="Ready to Serve" {% if item.status == "Ready to Serve" %}selected{% endif %}>Ready to Serve</option>
+                            <option value="Finished" {% if item.status == "Finished" %}selected{% endif %}>Finished</option>
+                            <option value="Cancelled" {% if item.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <form method="post" style="margin-top: 10px;">
+        {% csrf_token %}
+        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+        <label for="all_items_status_{{ order.order_id }}">Update All Items' Status:</label>
+        <select name="new_status" id="all_items_status_{{ order.order_id }}">
+            <option value="Cooking">Cooking</option>
+            <option value="Ready to Serve">Ready to Serve</option>
+            <option value="Finished">Finished</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+        <button type="submit">Update All</button>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}

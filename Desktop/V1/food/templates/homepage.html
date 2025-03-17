@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <!-- Section: Select Package -->
+    <section>
+        <h2>Select a Package</h2>
+        <form id="packageForm" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="package" value="279" {% if selected_package == "279" %}checked{% endif %} required>
+                    Package 279
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="radio" name="package" value="379" {% if selected_package == "379" %}checked{% endif %} required>
+                    Package 379
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Package</button>
+        </form>
+    </section>
+
+    <!-- Popup Modal -->
+    <div id="popup" class="popup-overlay" style="display: none;" onclick="overlayClick(event)">
+        <div class="popup-box">
+            <h3>Package Submitted Successfully</h3>
+            <p class="popup-message"> Package has been submitted successfully. </p>
+            <button class="btn btn-primary" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.getElementById("packageForm");
+
+            // Prevent immediate form submission, show the popup instead
+            form.addEventListener("submit", function(event) {
+                event.preventDefault(); // Prevent the form from submitting immediately
+                showPopup(); // Show the popup when the form is submitted
+            });
+        });
+
+        // Function to show the popup
+        function showPopup() {
+            const popup = document.getElementById("popup");
+            popup.style.display = "flex"; // Show the popup by changing display style to flex
+        }
+
+        // Function to close the popup and submit the form
+        function closePopup() {
+            const popup = document.getElementById("popup");
+            popup.style.display = "none"; // Hide the popup
+            document.getElementById("packageForm").submit(); // Submit the form after closing the popup
+        }
+    
+        // Dismiss popup when clicking the overlay
+        function overlayClick(event) {
+            if (event.target === document.getElementById('popup')) {
+                closePopup();
+            }
+        }
+    </script>
+
+    <hr />
+
+    <!-- Section: Generate QR Code -->
+    {% if selected_package %}
+    <section>
+        <h2>Generate QR Code for a Table</h2>
+        {% if error %}
+            <p style="color: red; font-weight: bold;">{{ error }}</p>
+        {% endif %}
+        <form id="qrForm" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="num_customers">Number of Customers:</label>
+                <input 
+                    type="number" 
+                    id="num_customers" 
+                    name="num_customers" 
+                    class="form-control" 
+                    min="1" 
+                    placeholder="Enter the number of customers" 
+                    required>
+            </div>
+            <button type="submit" class="btn btn-success">Generate QR Code</button>
+        </form>
+    </section>
+    {% endif %}
+
+    <!-- Popup Modal for QR Code -->
+    {% if qr_image_path %}
+    <div id="qrPopup" class="popup-overlay" style="display: block;" onclick="overlayClick(event)">
+        <div class="popup-box">
+            <h3>QR Code Generated</h3>
+            <img src="{{ qr_image_path }}" alt="QR Code">
+            <p>Group Order ID: {{ group_order_id }}</p>
+            <button class="btn btn-secondary" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+    <script>
+        // Close modal function
+        function closePopup() {
+            document.getElementById('qrPopup').style.display = 'none';
+            document.body.classList.remove('modal-open'); // Restore scrolling
+        }
+
+        // Close modal if overlay is clicked
+        function overlayClick(event) {
+            if (event.target === document.getElementById('qrPopup')) {
+                closePopup();
+            }
+        }
+
+        // Prevent body scroll when modal is open
+        document.body.classList.add('modal-open');
+    </script>
+    {% endif %}
+
+    <style>
+        /* Modal Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7); /* Dim background */
+            display: flex; /* Flexbox for centering */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        /* Popup Box */
+        .popup-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%; /* Responsive design */
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-in-out;
+            position: relative;
+        }
+
+        .popup-box img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .popup-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .popup-box button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #6c757d;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .popup-box button:hover {
+            background-color: #5a6268;
+        }
+
+        /* Fade In Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Prevent scrolling when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}

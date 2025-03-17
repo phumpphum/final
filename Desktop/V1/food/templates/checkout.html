@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+<title>Checkout</title>
+
+{% load custom_filters %}
+{% block content %}
+    <h2>Checkout</h2>
+
+    <!-- Grouped Order Summary -->
+    <h3>Order Summary</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Dish Name</th>
+                <th>Quantity</th>
+                <th>Price Per Unit</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in grouped_items %}
+            <tr>
+                <td>{{ item.dish__name }}</td>
+                <td>{{ item.total_quantity }}</td>
+                <td>{{ item.dish__price }}</td>
+                <td>{{ item.dish__price|floatformat:2|floatformat:2|mul:item.total_quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><strong>Total: {{ order.total_price }}</strong></p>
+
+    <!-- Payment Form -->
+    <form method="post">
+        {% csrf_token %}
+        <label>Select Payment Method:</label>
+        <select name="payment_method">
+            <option value="QR Code">QR Code</option>
+            <option value="Cash">Cash</option>
+        </select>
+        <button type="submit">Pay</button>
+    </form>
+{% endblock %}

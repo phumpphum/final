@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Order Status</h2>
+<p><strong>Order ID:</strong> {{ order.order_id }}</p>
+<ul>
+    {% for item in order.items.all %}
+        {% if item.status != 'Finished' and item.status != 'Cancelled' %}
+        <li>{{ item.dish.name }} - Quantity: {{ item.quantity }} - Status: {{ item.status }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+<!--<p><strong>Overall Status:</strong> {{ order.status }}</p>-->
+<a href="{% url 'order_page' order.order_id %}">Menu</a>
+<!--<a href="{% url 'checkout' order.order_id %}">Checkout</a>-->
+{% endblock %}
