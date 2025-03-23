@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-4">Order Status</h2>
+
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+
+        <!-- Active Orders -->
+        <h4 class="mt-4 text-primary"><i class="fas fa-hourglass-half"></i> Active Orders</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Dish</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if item.status != 'Finished' and item.status != 'Cancelled' %}
+                            <tr>
+                                <td>{{ item.dish.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if item.status == 'Pending' %}badge-warning
+                                        {% elif item.status == 'Cooking' %}badge-info
+                                        {% else %}badge-secondary{% endif %}">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No active orders.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Finished Orders -->
+        <h4 class="mt-4 text-success"><i class="fas fa-check-circle"></i> Finished Orders</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Dish</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                        {% if item.status == 'Finished' or item.status == 'Cancelled' %}
+                            <tr>
+                                <td>{{ item.dish.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if item.status == 'Finished' %}badge-success
+                                        {% elif item.status == 'Cancelled' %}badge-danger
+                                        {% endif %}">
+                                        {{ item.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No finished orders.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'order_page' order.order_id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

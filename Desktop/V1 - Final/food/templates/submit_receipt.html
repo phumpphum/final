@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Submit Receipt{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Submit Transaction Slip</h3>
+
+    <!-- Search Bar -->
+    <form method="GET" class="form-inline mb-3">
+        <input type="text" name="search" class="form-control mr-2" placeholder="Search by Invoice ID or Order ID" value="{{ request.GET.search }}">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        <a href="{% url 'submit_receipt' %}" class="btn btn-outline-secondary ml-2">Reset</a>
+    </form>
+
+    <!-- Submission Form -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="order_id">Select Invoice (Order ID):</label>
+            <select class="form-control" id="order_id" name="order_id" required>
+                {% for invoice in invoices %}
+                    <option value="{{ invoice.order.order_id }}">
+                        Order: {{ invoice.order.order_id }} — Invoice: {{ invoice.invoice_id }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="transaction_image">Upload Transaction Slip:</label>
+            <input type="file" class="form-control-file" name="transaction_image" accept="image/*" required>
+        </div>
+
+        <button type="submit" class="btn btn-success">Submit Slip</button>
+    </form>
+</div>
+{% endblock %}
