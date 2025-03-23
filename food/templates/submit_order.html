@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Order Submitted{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <h2 class="text-center text-success"><i class="fas fa-check-circle"></i> Order Submitted</h2>
+        <p class="text-center text-muted"><strong>Order ID:</strong> {{ order.id }}</p>
+
+        <div class="alert alert-success text-center">
+            <strong>✅ Your order has been submitted successfully!</strong>
+        </div>
+
+        <!-- New Orders Section -->
+        <h4 class="mt-4 text-primary"><i class="fas fa-hourglass-half"></i> New Orders</h4>
+        <ul class="list-group mt-3">
+            {% for item in submitted_items %}
+                {% if item.status != "Finished" and item.status != "Cancelled" %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ item.quantity }} x {{ item.dish.name }}</strong>
+                        {% if item.additional_option %}
+                            <br><small class="text-muted">(Options: {{ item.additional_option }})</small>
+                        {% endif %}
+                    </div>
+                    <span class="badge 
+                        {% if item.status == 'Pending' %} badge-warning
+                        {% elif item.status == 'Cooking' %} badge-info
+                        {% else %} badge-secondary {% endif %}">
+                        {{ item.status }}
+                    </span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if not submitted_items or not submitted_items|length %}
+                <li class="list-group-item text-center text-muted">No new orders.</li>
+            {% endif %}
+        </ul>
+
+        <!-- Finished Orders Section -->
+        <h4 class="mt-4 text-success"><i class="fas fa-clipboard-check"></i> Finished Orders</h4>
+        <ul class="list-group mt-3">
+            {% for item in order.items.all %}
+                {% if item.status == "Finished" or item.status == "Cancelled" %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ item.quantity }} x {{ item.dish.name }}</strong>
+                        {% if item.additional_option %}
+                            <br><small class="text-muted">(Options: {{ item.additional_option }})</small>
+                        {% endif %}
+                    </div>
+                    <span class="badge 
+                        {% if item.status == 'Finished' %} badge-success
+                        {% elif item.status == 'Cancelled' %} badge-danger
+                        {% endif %}">
+                        {{ item.status }}
+                    </span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if not order.items.all|length %}
+                <li class="list-group-item text-center text-muted">No finished orders.</li>
+            {% endif %}
+        </ul>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'order_page' order_id %}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Kitchen{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">👨‍🍳 Kitchen Orders</h2>
+
+    {% for order in orders %}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">🪑 Table {{ order.table.table_number }}</h4>
+            <h6 class="text-muted">Order ID: {{ order.id }}</h6>
+
+            <!-- Active Items Table -->
+            <h5 class="mt-4">🔥 Active Items</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Dish</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            {% if item.status != 'Finished' and item.status != 'Cancelled' %}
+                            <tr>
+                                <td>{{ item.dish.name }}</td>
+                                <td>x{{ item.quantity }}</td>
+                                <td><span class="badge bg-secondary">{{ item.status }}</span></td>
+                                <td>
+                                    <form method="post" class="d-flex gap-2 flex-wrap">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <select name="new_status" class="form-select form-select-sm" style="min-width: 160px;">
+                                            <option value="Cooking" {% if item.status == "Cooking" %}selected{% endif %}>Cooking</option>
+                                            <option value="Ready to Serve" {% if item.status == "Ready to Serve" %}selected{% endif %}>Ready to Serve</option>
+                                            <option value="Cancelled" {% if item.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cancelled Items Table -->
+            <h5 class="mt-4 text-danger">❌ Cancelled Items</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Dish</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            {% if item.status == 'Cancelled' %}
+                            <tr>
+                                <td>{{ item.dish.name }}</td>
+                                <td>x{{ item.quantity }}</td>
+                                <td><span class="badge bg-danger">{{ item.status }}</span></td>
+                                <td>{{ item.updated_at }}</td>
+                            </tr>
+                            {% endif %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No cancelled items.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bulk Update -->
+            <form method="post" class="mt-3 d-flex flex-column flex-md-row align-items-md-center gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" value="{{ order.order_id }}">
+                <label class="fw-bold">Update All Items:</label>
+                <select name="new_status" class="form-select form-select-sm" style="min-width: 160px;">
+                    <option value="Cooking">Cooking</option>
+                    <option value="Ready to Serve">Ready to Serve</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-success">Update All</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

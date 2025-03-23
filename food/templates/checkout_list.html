@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Checkout Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">🧾 Pending Orders</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle shadow-sm bg-white">
+            <thead class="thead-light">
+                <tr>
+                    <th>Table Number</th>
+                    <th>Number of Customers</th>
+                    <th>Package</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.table.table_number }}</td>
+                    <td>{{ order.num_customers }}</td>
+                    <td>{{ order.total_price }}</td>
+                    <td>
+                        <a href="{% url 'checkout' order.order_id %}" class="btn btn-sm btn-primary">
+                            💳 Proceed to Checkout
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No pending orders</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

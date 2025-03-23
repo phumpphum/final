@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .receipt { max-width: 400px; margin: auto; border: 1px solid #ddd; padding: 20px; }
+        .receipt-header { text-align: center; margin-bottom: 20px; }
+        .receipt-items table { width: 100%; border-collapse: collapse; }
+        .receipt-items th, .receipt-items td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .receipt-footer { margin-top: 20px; text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="receipt">
+        <div class="receipt-header">
+            <h2>Restaurant Name</h2>
+            <p>Order ID: {{ order.id }}</p>
+            <p>Date: {{ order.created_time|date:"d-m-Y H:i:s" }}</p>
+        </div>
+        <div class="receipt-items">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Dish</th>
+                        <th>Qty</th>
+                        <!--<th>Price</th>
+                        <th>Total</th>-->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dish, details in grouped_items %}
+                    <tr>
+                        <td>{{ dish.name }}</td>
+                        <td>{{ details.quantity }}</td>
+                        <!--<td>{{ dish.price }}</td>
+                        <td>{{ details.total_price }}</td>-->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="receipt-footer">
+            <p><strong>Total Price:</strong> {{ adjusted_total_price }}</p>
+            <button onclick="printReceipt()">Print Receipt</button>
+        </div>
+    </div>
+
+    <script>
+        function printReceipt() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
